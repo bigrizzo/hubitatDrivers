@@ -6,7 +6,7 @@
  * Based on the Hubitat community driver httpGetSwitch
  */
 metadata {
-    definition(name: "Neo Smart Controller", namespace: "bigrizzo", author: "bigrizz", importUrl: "https://github.com/bigrizzo/hubitatDrivers/upload/master/NeoSmart.groovy") {
+    definition(name: "Neo Smart Controller", namespace: "bigrizzo", author: "bigrizz", importUrl: "https://github.com/bigrizzo/hubitatDrivers/blob/master/NeoSmart.groovy") {
         capability "Actuator"
         capability "doorControl"
         capability "Sensor"
