@@ -8,6 +8,7 @@
 metadata {
     definition(name: "Neo Smart Controller", namespace: "bigrizzo", author: "bigrizz", importUrl: "https://github.com/bigrizzo/hubitatDrivers/blob/master/NeoSmart.groovy") {
         capability "WindowShade"
+		capability "Switch"
 		
 		command "stop"
 		command "favorite"
@@ -36,6 +37,14 @@ def updated() {
 
 def parse(String description) {
     if (logEnable) log.debug(description)
+}
+
+def on() {
+	open() 
+}
+
+def off() {
+	close()
 }
 
 def close() {
