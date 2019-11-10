@@ -126,7 +126,14 @@ def favorite() {
 def setPosition(position) {
     def dateTime = new Date()
     def currentTimeEpoch = dateTime.getTime()
-    url = "http://" + controllerIP + "/neo/v1/transmit?command=" + blindCode + "-" + position + "&id=" + controllerID + "&hash=" + currentTimeEpoch
+	if (position >= 100) {
+		position = 99
+	}
+	if (position < 10) {
+    	url = "http://" + controllerIP + "/neo/v1/transmit?command=" + blindCode + "-0" + position + "&id=" + controllerID + "&hash=" + currentTimeEpoch
+	} else {
+    	url = "http://" + controllerIP + "/neo/v1/transmit?command=" + blindCode + "-" + position + "&id=" + controllerID + "&hash=" + currentTimeEpoch
+	}
     if (logEnable) log.debug "Sending position ${position} GET request to ${url}"
 
     try {
