@@ -6,7 +6,7 @@
  * Based on the Hubitat community driver httpGetSwitch
  */
 metadata {
-    definition(name: "Neo Smart Controller", namespace: "bigrizzo", author: "bigrizz", importUrl: "https://github.com/bigrizzo/hubitatDrivers/blob/master/NeoSmart.groovy") {
+    definition(name: "Neo Smart Controller", namespace: "bigrizzo", author: "bigrizz", importUrl: "https://raw.githubusercontent.com/bdwilson/hubitatDrivers/master/NeoSmart.groovy") {
         capability "WindowShade"
 		capability "Switch"
 		
@@ -31,6 +31,9 @@ def logsOff() {
 
 def updated() {
     log.info "updated..."
+	if (!controllerID || !controllerIP || !blindCode) {
+		log.error "Please make sure controller ID, IP and blind/room codes are configured." 
+	}
     log.warn "debug logging is: ${logEnable == true}"
     if (logEnable) runIn(1800, logsOff)
 }
