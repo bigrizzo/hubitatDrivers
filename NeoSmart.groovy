@@ -39,9 +39,9 @@ def parse(String description) {
 }
 
 def close() {
-	def dateTime = new Date()     
-	def currentTimeEpoch = dateTime.getTime()
-	url = "http://" + controllerIP + "/neo/v1/transmit?command=" + blindCode + "-dn&id=" + controllerID + "&hash=" + currentTimeEpoch
+    def dateTime = new Date()     
+    def currentTimeEpoch = dateTime.getTime()
+    url = "http://" + controllerIP + "/neo/v1/transmit?command=" + blindCode + "-dn&id=" + controllerID + "&hash=" + currentTimeEpoch
     if (logEnable) log.debug "Sending close GET request to ${url}"
 
     try {
