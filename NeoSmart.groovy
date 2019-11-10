@@ -7,21 +7,18 @@
  */
 metadata {
     definition(name: "Neo Smart Controller", namespace: "bigrizzo", author: "bigrizz", importUrl: "https://github.com/bigrizzo/hubitatDrivers/blob/master/NeoSmart.groovy") {
-        capability "Actuator"
-        capability "doorControl"
-        capability "Sensor"
+        capability "WindowShade"
 		
 		command "stop"
-		command "favourite"
+		command "favorite"
     }
 }
 
 preferences {
     section("URIs") {
-        input "closeURI", "text", title: "Close URI", required: false
-        input "openURI", "text", title: "Open URI", required: false
-		input "stopURI", "text", title: "Stop URI", required: false
-		input "faveURI", "text", title: "Favourite URI", required: false
+		input "blindCode", "text", title: "Blind or Room Code (from Neo App)", required: true
+		input "controllerIP", "text", title: "Controller IP Address", required: true
+		input "controllerID", "text", title: "Controller ID", required: true
         input name: "logEnable", type: "bool", title: "Enable debug logging", defaultValue: true
     }
 }
@@ -42,12 +39,15 @@ def parse(String description) {
 }
 
 def close() {
-    if (logEnable) log.debug "Sending close GET request to [${settings.closeURI}]"
+	def dateTime = new Date()     
+	def currentTimeEpoch = dateTime.getTime()
+	url = "http://" + controllerIP + "/neo/v1/transmit?command=" + blindCode + "-dn&id=" + controllerID + "&hash=" + currentTimeEpoch
+    if (logEnable) log.debug "Sending close GET request to ${url}"
 
     try {
-        httpGet(settings.closeURI) { resp ->
+        httpGet(url) { resp ->
             if (resp.success) {
-                sendEvent(name: "doorControl", value: "close", isStateChange: true)
+                sendEvent(name: "windowShade", value: "close", isStateChange: true)
             }
             if (logEnable)
                 if (resp.data) log.debug "${resp.data}"
@@ -58,12 +58,15 @@ def close() {
 }
 
 def open() {
-    if (logEnable) log.debug "Sending open GET request to [${settings.openURI}]"
+    def dateTime = new Date()
+    def currentTimeEpoch = dateTime.getTime()
+    url = "http://" + controllerIP + "/neo/v1/transmit?command=" + blindCode + "-up&id=" + controllerID + "&hash=" + currentTimeEpoch
+    if (logEnable) log.debug "Sending open GET request to ${url}"
 
     try {
-        httpGet(settings.openURI) { resp ->
+        httpGet(url) { resp ->
             if (resp.success) {
-                sendEvent(name: "doorControl", value: "open", isStateChange: true)
+                sendEvent(name: "windowShade", value: "open", isStateChange: true)
             }
             if (logEnable)
                 if (resp.data) log.debug "${resp.data}"
@@ -74,12 +77,15 @@ def open() {
 }
 
 def stop() {
-    if (logEnable) log.debug "Sending stop GET request to [${settings.stopURI}]"
+    def dateTime = new Date()
+    def currentTimeEpoch = dateTime.getTime()
+    url = "http://" + controllerIP + "/neo/v1/transmit?command=" + blindCode + "-sp&id=" + controllerID + "&hash=" + currentTimeEpoch
+    if (logEnable) log.debug "Sending stop GET request to ${url}"
 
     try {
-        httpGet(settings.stopURI) { resp ->
+        httpGet(url) { resp ->
             if (resp.success) {
-                sendEvent(name: "shade", value: "stop", isStateChange: true)
+                sendEvent(name: "windowShade", value: "partially open", isStateChange: true)
             }
             if (logEnable)
                 if (resp.data) log.debug "${resp.data}"
@@ -89,13 +95,35 @@ def stop() {
     }
 }
 
-def favourite() {
-    if (logEnable) log.debug "Sending favourite GET request to [${settings.faveURI}]"
+def favorite() {
+    def dateTime = new Date()
+    def currentTimeEpoch = dateTime.getTime()
+    url = "http://" + controllerIP + "/neo/v1/transmit?command=" + blindCode + "-gp&id=" + controllerID + "&hash=" + currentTimeEpoch
+    if (logEnable) log.debug "Sending favorite GET request to ${url}"
 
     try {
-        httpGet(settings.faveURI) { resp ->
+        httpGet(url) { resp ->
             if (resp.success) {
-                sendEvent(name: "shade", value: "favourite", isStateChange: true)
+                sendEvent(name: "windowShade", value: "partially open", isStateChange: true)
+            }
+            if (logEnable)
+                if (resp.data) log.debug "${resp.data}"
+        }
+    } catch (Exception e) {
+        log.warn "Call to favourite failed: ${e.message}"
+    }
+}
+
+def setPosition(position) {
+    def dateTime = new Date()
+    def currentTimeEpoch = dateTime.getTime()
+    url = "http://" + controllerIP + "/neo/v1/transmit?command=" + blindCode + "-" + position + "&id=" + controllerID + "&hash=" + currentTimeEpoch
+    if (logEnable) log.debug "Sending position ${position} GET request to ${url}"
+
+    try {
+        httpGet(url) { resp ->
+            if (resp.success) {
+                sendEvent(name: "windowShade", value: "partially open", isStateChange: true)
             }
             if (logEnable)
                 if (resp.data) log.debug "${resp.data}"
