@@ -17,8 +17,8 @@ metadata {
 preferences {
     section("URIs") {
 		input "blindCode", "text", title: "Blind or Room Code (from Neo App)", required: true
-		input "controllerIP", "text", title: "Controller IP Address", required: true
-		input "controllerID", "text", title: "Controller ID", required: true
+		input "controllerID", "text", title: "Controller ID (from Neo App)", required: true
+		input "controllerIP", "text", title: "Controller IP Address (from Neo App)", required: true
         input name: "logEnable", type: "bool", title: "Enable debug logging", defaultValue: true
     }
 }
