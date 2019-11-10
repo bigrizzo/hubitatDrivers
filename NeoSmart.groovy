@@ -29,6 +29,15 @@ def logsOff() {
     device.updateSetting("logEnable", [value: "false", type: "bool"])
 }
 
+def installed() {
+    log.info "installed..."
+	if (!controllerID || !controllerIP || !blindCode) {
+		log.error "Please make sure controller ID, IP and blind/room codes are configured." 
+	}
+    log.warn "debug logging is: ${logEnable == true}"
+    if (logEnable) runIn(1800, logsOff)
+}
+
 def updated() {
     log.info "updated..."
 	if (!controllerID || !controllerIP || !blindCode) {
