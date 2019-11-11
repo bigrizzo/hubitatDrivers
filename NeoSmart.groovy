@@ -72,8 +72,7 @@ def off() {
 }
 
 def close() {
-    def dateTime = new Date()     
-    def currentTimeEpoch = dateTime.getTime().take(7)
+    def currentTimeEpoch = System.currentTimeMillis().toString().drop(6)
     url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-dn&id=" + controllerID + "&hash=" + currentTimeEpoch
     if (logEnable) log.debug "Sending close GET request to ${url}"
 
@@ -91,8 +90,7 @@ def close() {
 }
 
 def open() {
-    def dateTime = new Date()
-    def currentTimeEpoch = dateTime.getTime().take(7)
+    def currentTimeEpoch = System.currentTimeMillis().toString().drop(6)
     url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-up&id=" + controllerID + "&hash=" + currentTimeEpoch
     if (logEnable) log.debug "Sending open GET request to ${url}"
 
@@ -110,8 +108,7 @@ def open() {
 }
 
 def stop() {
-    def dateTime = new Date()
-    def currentTimeEpoch = dateTime.getTime().take(7)
+    def currentTimeEpoch = System.currentTimeMillis().toString().drop(6)
     url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-sp&id=" + controllerID + "&hash=" + currentTimeEpoch
     if (logEnable) log.debug "Sending stop GET request to ${url}"
 
@@ -129,8 +126,7 @@ def stop() {
 }
 
 def favorite() {
-    def dateTime = new Date()
-    def currentTimeEpoch = dateTime.getTime().take(7)
+    def currentTimeEpoch = System.currentTimeMillis().toString().drop(6)
     url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-gp&id=" + controllerID + "&hash=" + currentTimeEpoch
     if (logEnable) log.debug "Sending favorite GET request to ${url}"
 
@@ -151,8 +147,7 @@ def setPosition(position) {
 	/* what would be ideal is if we knew the position of blind at any time, and
     could then use setPosition to do the micro-step up/down multiple times for
     blinds that don't support going to specific positions */
-    def dateTime = new Date()
-    def currentTimeEpoch = dateTime.getTime().take(7)
+	def currentTimeEpoch = System.currentTimeMillis().toString().drop(6)
 	if (position >= 100) {
 		position = 99
 	}
@@ -178,8 +173,7 @@ def setPosition(position) {
 
 def startLevelChange(direction) {
 	/* https://github.com/hubitat/HubitatPublic/blob/master/examples/drivers/genericComponentDimmer.groovy */
-	def dateTime = new Date()
-    def currentTimeEpoch = dateTime.getTime().take(7)
+    def currentTimeEpoch = System.currentTimeMillis().toString().drop(6)
     if (direction == "up") {
         url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-mu" + position + "&id=" + controllerID + "&hash=" + currentTimeEpoch
     } else {
