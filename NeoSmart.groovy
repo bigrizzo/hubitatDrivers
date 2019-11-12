@@ -137,9 +137,9 @@ def setPosition(position) {
 def startLevelChange(direction) {
 	/* https://github.com/hubitat/HubitatPublic/blob/master/examples/drivers/genericComponentDimmer.groovy */
     if (direction == "up") {
-        url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-mu" + position + "&id=" + controllerID + "&hash=" + date()
+        url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-mu&id=" + controllerID + "&hash=" + date()
     } else {
-        url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-md" + position + "&id=" + controllerID + "&hash=" + date()
+        url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-md&id=" + controllerID + "&hash=" + date()
     }
     if (logEnable) log.debug "Sending startLevel Change ${direction} GET request to ${url}"
     get(url,"partially open")
@@ -149,14 +149,14 @@ def setLevel(level) {
 	if ((state.level <= 100) && (state.level >= 0)) {
 		if (level < state.level) {
 			for (def i=state.level; i>=level; i--) {
-				url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-mu" + position + "&id=" + controllerID + "&hash=" + date()
+				url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-mu&id=" + controllerID + "&hash=" + date()
 				get(url,"partially open")
 				if (logEnable) log.debug "Sending micro up burst ${i} >= ${level}"
 				pauseExecution(500)
 			}
 		} else {
 			for (def і=state.level; i<=level; i++) {
-				url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-md" + position + "&id=" + controllerID + "&hash=" + date()
+				url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-md&id=" + controllerID + "&hash=" + date()
 				get(url,"partially open")
 				if (logEnable) log.debug "Sending micro down burst ${i} <= ${level}"
 				pauseExecution(500)
