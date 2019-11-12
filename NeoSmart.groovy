@@ -146,7 +146,7 @@ def startLevelChange(direction) {
 }
 
 def setLevel(level) {
-	if ((level <= 100) && (level >= 0)) {
+	if ((state.level <= 100) && (state.level >= 0)) {
 		if (level < state.level) {
 			for (def i=state.level; i>=level; i--) {
 				url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-mu" + position + "&id=" + controllerID + "&hash=" + date()
