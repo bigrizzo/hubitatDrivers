@@ -35,17 +35,17 @@ def date() {
 	return date
 }
 
-def get(url) {
+def get(url,state) {
    try {
         httpGet(url) { resp ->
             if (resp.success) {
-                sendEvent(name: "windowShade", value: "close", isStateChange: true)
+                sendEvent(name: "windowShade", value: "${state}", isStateChange: true)
             }
             if (logEnable)
                 if (resp.data) log.debug "${resp.data}"
         }
     } catch (Exception e) {
-        log.warn "Call to close failed: ${e.message}"
+        log.warn "Call to ${url} failed: ${e.message}"
     }
 }
 
@@ -95,58 +95,27 @@ def off() {
 def close() {
     url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-dn&id=" + controllerID + "&hash=" + date()
     if (logEnable) log.debug "Sending close GET request to ${url}"
-	get(url)
+	get(url,"closed")
+	state.level=0
 }
 
 def open() {
     url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-up&id=" + controllerID + "&hash=" + date()
     if (logEnable) log.debug "Sending open GET request to ${url}"
-
-    try {
-        httpGet(url) { resp ->
-            if (resp.success) {
-                sendEvent(name: "windowShade", value: "open", isStateChange: true)
-            }
-            if (logEnable)
-                if (resp.data) log.debug "${resp.data}"
-        }
-    } catch (Exception e) {
-        log.warn "Call to open failed: ${e.message}"
-    }
+	get(url,"open")
+	state.level=100
 }
 
 def stop() {
     url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-sp&id=" + controllerID + "&hash=" + date()
     if (logEnable) log.debug "Sending stop GET request to ${url}"
-
-    try {
-        httpGet(url) { resp ->
-            if (resp.success) {
-                sendEvent(name: "windowShade", value: "partially open", isStateChange: true)
-            }
-            if (logEnable)
-                if (resp.data) log.debug "${resp.data}"
-        }
-    } catch (Exception e) {
-        log.warn "Call to stop failed: ${e.message}"
-    }
+	get(url,"partially open")
 }
 
 def favorite() {
     url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-gp&id=" + controllerID + "&hash=" + date()
     if (logEnable) log.debug "Sending favorite GET request to ${url}"
-
-    try {
-        httpGet(url) { resp ->
-            if (resp.success) {
-                sendEvent(name: "windowShade", value: "partially open", isStateChange: true)
-            }
-            if (logEnable)
-                if (resp.data) log.debug "${resp.data}"
-        }
-    } catch (Exception e) {
-        log.warn "Call to favourite failed: ${e.message}"
-    }
+	get(url,"partially open")
 }
 
 def setPosition(position) {
@@ -162,18 +131,7 @@ def setPosition(position) {
     	url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-" + position + "&id=" + controllerID + "&hash=" + date()
 	}
     if (logEnable) log.debug "Sending position ${position} GET request to ${url}"
-
-    try {
-        httpGet(url) { resp ->
-            if (resp.success) {
-                sendEvent(name: "windowShade", value: "partially open", isStateChange: true)
-            }
-            if (logEnable)
-                if (resp.data) log.debug "${resp.data}"
-        }
-    } catch (Exception e) {
-        log.warn "Call to favourite failed: ${e.message}"
-    }
+	get(url,"partialy open")
 }
 
 def startLevelChange(direction) {
@@ -184,16 +142,27 @@ def startLevelChange(direction) {
         url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-md" + position + "&id=" + controllerID + "&hash=" + date()
     }
     if (logEnable) log.debug "Sending startLevel Change ${direction} GET request to ${url}"
-
-    try {
-        httpGet(url) { resp ->
-            if (resp.success) {
-                sendEvent(name: "windowShade", value: "partially open", isStateChange: true)
-            }
-            if (logEnable)
-                if (resp.data) log.debug "${resp.data}"
-        }
-    } catch (Exception e) {
-        log.warn "Call to favourite failed: ${e.message}"
-    }
+    get(url,"partially open")
 }
+
+def setLevel(level) {
+	if ((level <= 100) && (level >= 0)) {
+		if (level < state.level) {
+			for (def i=state.level; i>=level; i--) {
+				url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-mu" + position + "&id=" + controllerID + "&hash=" + date()
+				get(url,"partially open")
+				if (logEnable) log.debug "Sending micro up burst ${i} >= ${level}"
+				pauseExecution(500)
+			}
+		} else {
+			for (def і=state.level; i<=level; i++) {
+				url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-md" + position + "&id=" + controllerID + "&hash=" + date()
+				get(url,"partially open")
+				if (logEnable) log.debug "Sending micro down burst ${i} <= ${level}"
+				pauseExecution(500)
+			}
+		}
+		state.level=level
+	}
+}
+
