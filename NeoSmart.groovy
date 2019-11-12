@@ -11,6 +11,7 @@ metadata {
 		capability "Switch"
 		capability "Actuator"
 	 	capability "ChangeLevel"   
+		capability "Switch Level"
 		
 		command "stop"
 		command "favorite"
@@ -25,6 +26,26 @@ preferences {
 		input "controllerID", "text", title: "Controller ID (from Neo App)", required: true
 		input "controllerIP", "text", title: "Controller IP Address (from Neo App)", required: true
         input name: "logEnable", type: "bool", title: "Enable debug logging", defaultValue: true
+    }
+}
+
+def date() {
+	def date = new Date().getTime().toString().drop(6)
+    if (logEnable) log.debug "Using ${date}"
+	return date
+}
+
+def get(url) {
+   try {
+        httpGet(url) { resp ->
+            if (resp.success) {
+                sendEvent(name: "windowShade", value: "close", isStateChange: true)
+            }
+            if (logEnable)
+                if (resp.data) log.debug "${resp.data}"
+        }
+    } catch (Exception e) {
+        log.warn "Call to close failed: ${e.message}"
     }
 }
 
@@ -72,26 +93,13 @@ def off() {
 }
 
 def close() {
-    def currentTimeEpoch = System.currentTimeMillis().toString().drop(6)
-    url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-dn&id=" + controllerID + "&hash=" + currentTimeEpoch
+    url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-dn&id=" + controllerID + "&hash=" + date()
     if (logEnable) log.debug "Sending close GET request to ${url}"
-
-    try {
-        httpGet(url) { resp ->
-            if (resp.success) {
-                sendEvent(name: "windowShade", value: "close", isStateChange: true)
-            }
-            if (logEnable)
-                if (resp.data) log.debug "${resp.data}"
-        }
-    } catch (Exception e) {
-        log.warn "Call to close failed: ${e.message}"
-    }
+	get(url)
 }
 
 def open() {
-    def currentTimeEpoch = System.currentTimeMillis().toString().drop(6)
-    url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-up&id=" + controllerID + "&hash=" + currentTimeEpoch
+    url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-up&id=" + controllerID + "&hash=" + date()
     if (logEnable) log.debug "Sending open GET request to ${url}"
 
     try {
@@ -108,8 +116,7 @@ def open() {
 }
 
 def stop() {
-    def currentTimeEpoch = System.currentTimeMillis().toString().drop(6)
-    url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-sp&id=" + controllerID + "&hash=" + currentTimeEpoch
+    url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-sp&id=" + controllerID + "&hash=" + date()
     if (logEnable) log.debug "Sending stop GET request to ${url}"
 
     try {
@@ -126,8 +133,7 @@ def stop() {
 }
 
 def favorite() {
-    def currentTimeEpoch = System.currentTimeMillis().toString().drop(6)
-    url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-gp&id=" + controllerID + "&hash=" + currentTimeEpoch
+    url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-gp&id=" + controllerID + "&hash=" + date()
     if (logEnable) log.debug "Sending favorite GET request to ${url}"
 
     try {
@@ -147,14 +153,13 @@ def setPosition(position) {
 	/* what would be ideal is if we knew the position of blind at any time, and
     could then use setPosition to do the micro-step up/down multiple times for
     blinds that don't support going to specific positions */
-	def currentTimeEpoch = System.currentTimeMillis().toString().drop(6)
 	if (position >= 100) {
 		position = 99
 	}
 	if (position < 10) {
-    	url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-0" + position + "&id=" + controllerID + "&hash=" + currentTimeEpoch
+    	url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-0" + position + "&id=" + controllerID + "&hash=" + date()
 	} else {
-    	url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-" + position + "&id=" + controllerID + "&hash=" + currentTimeEpoch
+    	url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-" + position + "&id=" + controllerID + "&hash=" + date()
 	}
     if (logEnable) log.debug "Sending position ${position} GET request to ${url}"
 
@@ -173,11 +178,10 @@ def setPosition(position) {
 
 def startLevelChange(direction) {
 	/* https://github.com/hubitat/HubitatPublic/blob/master/examples/drivers/genericComponentDimmer.groovy */
-    def currentTimeEpoch = System.currentTimeMillis().toString().drop(6)
     if (direction == "up") {
-        url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-mu" + position + "&id=" + controllerID + "&hash=" + currentTimeEpoch
+        url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-mu" + position + "&id=" + controllerID + "&hash=" + date()
     } else {
-        url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-md" + position + "&id=" + controllerID + "&hash=" + currentTimeEpoch
+        url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-md" + position + "&id=" + controllerID + "&hash=" + date()
     }
     if (logEnable) log.debug "Sending startLevel Change ${direction} GET request to ${url}"
 
