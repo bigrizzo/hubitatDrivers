@@ -111,7 +111,8 @@ def close() {
     url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-dn&id=" + controllerID + "&hash=" + date()
     if (logEnable) log.debug "Sending close GET request to ${url}"
 	get(url,"closed")
-	state.level=timeToClose
+	state.level=100
+    state.secs=timeToClose
 }
 
 def open() {
@@ -119,6 +120,7 @@ def open() {
     if (logEnable) log.debug "Sending open GET request to ${url}"
 	get(url,"open")
 	state.level=0
+    state.secs=0
 }
 
 def stop() {
@@ -130,36 +132,42 @@ def stop() {
 def favorite() {
     url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-gp&id=" + controllerID + "&hash=" + date()
     if (logEnable) log.debug "Sending favorite GET request to ${url}"
-    state.level=timeToFav
+    state.secs=timeToFav
+    state.level=(timeToFav/timeToClose)*100
 	get(url,"partially open")
 }
 
-def setPosition(position) { // timeToClose= closed/down, 0=open/up
-	if (position >= timeToClose) {
-		position = timeToClose
+def setPosition(position) { // timeToClose= closed/down, 0=open/up.  percentage based. 
+    secs = (position/100)*timeToClose  // get percentage based on how long it takes to close
+	if (secs >= timeToClose) {
+		secs = timeToClose
 	}
     if (position != state.level) {
             if (position < state.level) { // requested location is more open than current. 
                 if (position == 0) {
                     open()
                     state.level=0
+                    state.secs=0
                 } else {
-                    def pos = state.level - position
+                    def pos = state.secs - secs
                     open()
                     pauseExecution(pos.toInteger()*1000)
                     stop()
                     state.level=position
+                    state.secs=secs
                 }
             } else {  // location is more closed than current
-                if (position == timeToClose) {
+                if (position == 100) {
                     close()
-                    state.level=timeToClose
+                    state.level=100
+                    state.secs=timeToClose
                 } else {
-                    pos = position - state.level
+                    pos = secs - state.secs
                     close()
                     pauseExecution(pos.toInteger()*1000)
                     stop()
                     state.level=position
+                    state.secs=secs
                 }
             }
       }
