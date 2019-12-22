@@ -133,6 +133,8 @@ def open() {
 }
 
 def stop() {
+    // todo, it would be nice if we could start a timer when someone opens/closes so if they stop we have an idea of where the shade is
+    // then we could reflect it by setting the level here... 
     url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-sp&id=" + controllerID + "&hash=" + date()
     if (logEnable) log.debug "Sending stop GET request to ${url}"
 	get(url,"partially open")
