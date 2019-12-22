@@ -9,12 +9,17 @@
  * otherwise, create another virtual driver for ones that are slower/faster). 
  * 
  * To use: 
- * 1) Run a stopwatch to see how long it takes for the blinds to close (in
+ * 1) Run a stopwatch to time how long it takes for the blinds to close (in
  * seconds)
- * 2) Open the blinds completely and time how long it takes to get to your
+ * 2) Open the blinds completely then time how long it takes to get to your
  * favorite setting) 
  * 
- * Input these values in the configuration, rounding down. 
+ * Input these values in the configuration, rounding down.  Your device will
+ * like a dimmable bulb to Alexa, thus you should be able to say "Alexa, turn
+ * the living room blinds to 50%" and it will go in the middle (or close). 
+ *
+ * Keep in mind, in order for this to work you have to always control the
+ * blinds through Hubitat and not the Neo App or RF remote. 
  *  
  * Based on the Hubitat community driver httpGetSwitch
  */
