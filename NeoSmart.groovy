@@ -156,8 +156,9 @@ def setPosition(position) { // timeToClose= closed/down, 0=open/up.  percentage 
                 } else {
                     def pos = state.secs - secs
                     open()
-                    pauseExecution(pos.toInteger()*1000)
-                    stop()
+                    //pauseExecution(pos.toInteger()*1000)
+					runIn(pos.toInteger(),stop)
+					//stop()
                     state.level=position
                     state.secs=secs
                 }
@@ -169,8 +170,9 @@ def setPosition(position) { // timeToClose= closed/down, 0=open/up.  percentage 
                 } else {
                     pos = secs - state.secs
                     close()
-                    pauseExecution(pos.toInteger()*1000)
-                    stop()
+                    //pauseExecution(pos.toInteger()*1000)
+					runIn(pos.toInteger(),stop)
+					//stop()
                     state.level=position
                     state.secs=secs
                 }
