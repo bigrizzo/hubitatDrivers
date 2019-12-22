@@ -115,17 +115,21 @@ def off() {
 def close() {
     url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-dn&id=" + controllerID + "&hash=" + date()
     if (logEnable) log.debug "Sending close GET request to ${url}"
+    sendEvent(name: "windowShade", value: "closing", isStateChange: true)
 	get(url,"closed")
 	state.level=100
     state.secs=timeToClose
+    sendEvent(name: "level", value: "${state.level}", isStateChange: true)
 }
 
 def open() {
     url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-up&id=" + controllerID + "&hash=" + date()
     if (logEnable) log.debug "Sending open GET request to ${url}"
+    sendEvent(name: "windowShade", value: "opening", isStateChange: true)
 	get(url,"open")
 	state.level=0
     state.secs=0
+    sendEvent(name: "level", value: "${state.level}", isStateChange: true)
 }
 
 def stop() {
@@ -140,10 +144,11 @@ def favorite() {
     state.secs=timeToFav
     state.level=(timeToFav/timeToClose)*100
 	get(url,"partially open")
+    sendEvent(name: "level", value: "${state.level}", isStateChange: true)
 }
 
-def setPosition(position) { // timeToClose= closed/down, 0=open/up.  percentage based. 
-    secs = (position/100)*timeToClose  // get percentage based on how long it takes to close
+def setPosition(position) { // timeToClose= closed/down, 0=open/up
+    secs = (position/100)*timeToClose  // get percentage based on how long it takes to open.     
 	if (secs >= timeToClose) {
 		secs = timeToClose
 	}
@@ -156,9 +161,8 @@ def setPosition(position) { // timeToClose= closed/down, 0=open/up.  percentage 
                 } else {
                     def pos = state.secs - secs
                     open()
-                    //pauseExecution(pos.toInteger()*1000)
-					runIn(pos.toInteger(),stop)
-					//stop()
+                    runIn(pos.toInteger(),stop)
+                    sendEvent(name: "level", value: "${pos}", isStateChange: true)
                     state.level=position
                     state.secs=secs
                 }
@@ -170,9 +174,8 @@ def setPosition(position) { // timeToClose= closed/down, 0=open/up.  percentage 
                 } else {
                     pos = secs - state.secs
                     close()
-                    //pauseExecution(pos.toInteger()*1000)
-					runIn(pos.toInteger(),stop)
-					//stop()
+                    runIn(pos.toInteger(),stop)
+                    sendEvent(name: "level", value: "${pos}", isStateChange: true)
                     state.level=position
                     state.secs=secs
                 }
@@ -192,5 +195,4 @@ def startLevelChange(direction) {
 }
 
 def setLevel(level) {
-    setPosition(level)
 }
