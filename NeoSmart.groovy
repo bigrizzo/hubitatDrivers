@@ -117,7 +117,7 @@ def close() {
     if (logEnable) log.debug "Sending close GET request to ${url}"
     sendEvent(name: "windowShade", value: "closing", isStateChange: true)
 	get(url,"closed")
-	state.level=100
+	state.level=0
     state.secs=timeToClose
     sendEvent(name: "level", value: "${state.level}", isStateChange: true)
 }
@@ -127,7 +127,7 @@ def open() {
     if (logEnable) log.debug "Sending open GET request to ${url}"
     sendEvent(name: "windowShade", value: "opening", isStateChange: true)
 	get(url,"open")
-	state.level=0
+	state.level=100
     state.secs=0
     sendEvent(name: "level", value: "${state.level}", isStateChange: true)
 }
@@ -144,40 +144,40 @@ def favorite() {
     url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-gp&id=" + controllerID + "&hash=" + date()
     if (logEnable) log.debug "Sending favorite GET request to ${url}"
     state.secs=timeToFav
-    state.level=(timeToFav/timeToClose)*100
+    state.level=100-((timeToFav/timeToClose)*100)
 	get(url,"partially open")
     sendEvent(name: "level", value: "${state.level}", isStateChange: true)
 }
 
 def setPosition(position) { // timeToClose= closed/down, 0=open/up
-    secs = (position/100)*timeToClose  // get percentage based on how long it takes to open.     
+    secs = timeToClose-((position/100)*timeToClose)  // get percentage based on how long it takes to open.     
 	if (secs >= timeToClose) {
 		secs = timeToClose
 	}
     if (position != state.level) {
-            if (position < state.level) { // requested location is more open than current. 
-                if (position == 0) {
+            if (position > state.level) { // requested location is more closed than current. 
+                if (position == 100) {
                     open()
-                    state.level=0
+                    state.level=100
                     state.secs=0
                 } else {
-                    def pos = state.secs - secs
+                    pos = state.secs - secs
                     open()
                     runIn(pos.toInteger(),stop)
-                    sendEvent(name: "level", value: "${pos}", isStateChange: true)
+                    sendEvent(name: "level", value: "${position}", isStateChange: true)
                     state.level=position
                     state.secs=secs
                 }
-            } else {  // location is more closed than current
-                if (position == 100) {
+            } else {  // location is less closed than current
+                if (position == 0) {
                     close()
-                    state.level=100
+                    state.level=0
                     state.secs=timeToClose
                 } else {
-                    pos = secs - state.secs
+                    def pos =  secs - state.secs
                     close()
                     runIn(pos.toInteger(),stop)
-                    sendEvent(name: "level", value: "${pos}", isStateChange: true)
+                    sendEvent(name: "level", value: "${position}", isStateChange: true)
                     state.level=position
                     state.secs=secs
                 }
@@ -197,4 +197,5 @@ def startLevelChange(direction) {
 }
 
 def setLevel(level) {
+    setPosition(level)
 }
