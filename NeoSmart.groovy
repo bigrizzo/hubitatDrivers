@@ -60,13 +60,13 @@ def date() {
 
 def get(url,state) {
    try {
-        //httpGet(url) { resp ->
-        //    if (resp.success) {
-        //        sendEvent(name: "windowShade", value: "${state}", isStateChange: true)
-       //     }
-        //    if (logEnable)
-        //        if (resp.data) log.debug "${resp.data}"
-       // }
+        httpGet(url) { resp ->
+            if (resp.success) {
+                sendEvent(name: "windowShade", value: "${state}", isStateChange: true)
+            }
+            if (logEnable)
+                if (resp.data) log.debug "${resp.data}"
+        }
     } catch (Exception e) {
         log.warn "Call to ${url} failed: ${e.message}"
     }
