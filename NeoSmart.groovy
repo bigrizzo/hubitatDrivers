@@ -50,20 +50,23 @@ preferences {
 }
 
 def date() {
-	def date = new Date().getTime().toString().drop(6)
+	//def date = new Date().getTime().toString().drop(6)
+    def origdate = new Date().getTime().toString().drop(6)  // API docs say only 7 chars 
+    def random = Math.random().toString().reverse().take(4) // get four random #'s
+    def date = origdate.toInteger() + random.toInteger()    // add 4 random #'s to millisecs
     //if (logEnable) log.debug "Using ${date}"
 	return date
 }
 
 def get(url,state) {
    try {
-        httpGet(url) { resp ->
-            if (resp.success) {
-                sendEvent(name: "windowShade", value: "${state}", isStateChange: true)
-            }
-            if (logEnable)
-                if (resp.data) log.debug "${resp.data}"
-        }
+        //httpGet(url) { resp ->
+        //    if (resp.success) {
+        //        sendEvent(name: "windowShade", value: "${state}", isStateChange: true)
+       //     }
+        //    if (logEnable)
+        //        if (resp.data) log.debug "${resp.data}"
+       // }
     } catch (Exception e) {
         log.warn "Call to ${url} failed: ${e.message}"
     }
