@@ -46,9 +46,7 @@ long it takes to get to the favorite setting from open.
 Optional Alexa Integration
 ---
 
-# Share out your blinds to the Hubitat Amazon Echo App. Ask Alexa to discover new devices.  
-# Within the Alexa App, you should see the devices show up as dimmer bulbs - thats ok; Alexa is dumb and doesn't know what a blind is.  If you're OK telling Alexa to turn on/off blinds, then you don't need to proceed any further. I prefer to use the terms "open/close" vs. "on/off".  
-## Unfortunately this doesn't work out of the box with Alexa, however it **DOES** work if you say "Alexa, open the living room blind to 50%".  The word "open" works fine if you also give the blind a percentage to open. 
-# If you go into Alexa -> Routines and create a routine that says "open the xxx blinds" and link to the proper device, then you don't have to say on/off. You'll have to setup both open and close routines per each blind, and perhaps create groups for "blinds" if you want them to all open/close.    
-
+* Share out your blinds to the Hubitat Amazon Echo App. Ask Alexa to discover new devices.  
+* Within the Alexa App, you should see the devices show up as dimmer bulbs - thats ok; Alexa is dumb and doesn't know what a blind is. If you're OK telling Alexa to turn on/off blinds, then you don't need to proceed any further. I prefer to use the terms "open/close" vs. "on/off". Unfortunately this doesn't work out of the box with Alexa, however it **DOES** work if you say "Alexa, open the living room blind to 50%".  The word "open" works fine if you also give the blind a percentage to open. 
+* If you go into Alexa -> Routines and create a routine that says "open the xxx blinds" and link to the proper device, then you don't have to say on/off. You'll have to setup both open and close routines per each blind, and perhaps create groups for "blinds" if you want them to all open/close.    
 
