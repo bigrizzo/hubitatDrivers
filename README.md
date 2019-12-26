@@ -30,10 +30,10 @@ since Neo doesn't give us a way to have two-way control of the blinds.
 2) Create a new Virtual driver and give it the name of your blind or set of
 blinds.  
 3) Open the NeoSmart app and locate the Smart Controller option. Put the
-contents of ''ID'' and ''IP'' into the settings of your virtual device.
+contents of **ID** and **IP** into the settings of your virtual device.
 4) Stil in the app, locate the blind you wish to control under your rooms,
-click the arrow on the right of the room.  You should see both ''Room Code''
-and ''Blind Code''. You need whichever code you wish to control - the room if
+click the arrow on the right of the room.  You should see both **Room Code**
+and **Blind Code**. You need whichever code you wish to control - the room if
 you wish to control the whole room, or blind code if you only wish to control
 the single blind. 
 5) While still in the NeoSmart app, use a stopwatch to close the blinds and
@@ -46,17 +46,9 @@ long it takes to get to the favorite setting from open.
 Optional Alexa Integration
 ---
 
-Share out your blinds to the Hubitat Amazon Echo App. Ask Alexa to discover new
-devices.  Within the Alexa App, you should see the devices show up as dimmer
-bulbs - thats ok; Alexa is dumb and doesn't know what a blind is.  If you're OK
-telling Alexa to turn on/off blinds, then you don't need to proceed any
-further. I'd prefer to use the terms "open/close" vs. "on/off".  Unfortunately
-this doesn't work out of the box with Alexa, however it DOES work if you say
-"Alexa, open the living room blind to 50%".  The word open works fine if you
-also give the blind a percentage to open. If you go into Alexa -> Routines and
-create a routine that says "open the xxx blinds" and link to the proper device,
-then you don't have to say on/off. You'll have to setup both open and close
-routines per each blind, and perhaps create groups for "blinds" if you want
-them to all open/close.    
+# Share out your blinds to the Hubitat Amazon Echo App. Ask Alexa to discover new devices.  
+# Within the Alexa App, you should see the devices show up as dimmer bulbs - thats ok; Alexa is dumb and doesn't know what a blind is.  If you're OK telling Alexa to turn on/off blinds, then you don't need to proceed any further. I prefer to use the terms "open/close" vs. "on/off".  
+## Unfortunately this doesn't work out of the box with Alexa, however it **DOES** work if you say "Alexa, open the living room blind to 50%".  The word "open" works fine if you also give the blind a percentage to open. 
+# If you go into Alexa -> Routines and create a routine that says "open the xxx blinds" and link to the proper device, then you don't have to say on/off. You'll have to setup both open and close routines per each blind, and perhaps create groups for "blinds" if you want them to all open/close.    
 
 
