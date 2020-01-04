@@ -24,7 +24,7 @@
  * Based on the Hubitat community driver httpGetSwitch
  */
 metadata {
-    definition(name: "Neo Smart Controller", namespace: "bigrizzo", author: "bigrizz", importUrl: "https://raw.githubusercontent.com/bdwilson/hubitatDrivers/master/NeoSmart.groovy") {
+    definition(name: "Neo Smart Controller-beta", namespace: "bigrizzo", author: "bigrizz", importUrl: "https://raw.githubusercontent.com/bdwilson/hubitatDrivers/master/NeoSmart.groovy") {
         capability "WindowShade"
 		capability "Switch"
 		capability "Actuator"
@@ -54,7 +54,7 @@ def date() {
     def origdate = new Date().getTime().toString().drop(6)  // API docs say only 7 chars 
     def random = Math.random().toString().reverse().take(4) // get four random #'s
     def date = origdate.toInteger() + random.toInteger()    // add 4 random #'s to millisecs
-    //if (logEnable) log.debug "Using ${date}"
+    if (logEnable) log.debug "Using ${date}"
 	return date
 }
 
@@ -63,8 +63,8 @@ def get(url,state) {
         httpGet(url) { resp ->
             if (resp.success) {
                 sendEvent(name: "windowShade", value: "${state}", isStateChange: true)
-            }
-            if (logEnable)
+           }
+           if (logEnable)
                 if (resp.data) log.debug "${resp.data}"
         }
     } catch (Exception e) {
@@ -143,6 +143,27 @@ def stop() {
 	get(url,"partially open")
 }
 
+def stopPosition() {
+    url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-sp&id=" + controllerID + "&hash=" + date()
+    if (logEnable) log.debug "Sending stop GET request to ${url}"
+	get(url,"partially open")
+    sendEvent(name: "level", value: "${state.newposition}", isStateChange: true)
+    if (logEnable) log.debug "Stopped ${state.newposition} ${state.difference}"
+    state.level=state.newposition
+    state.difference=0
+}
+
+def runAndStop() {
+    if (state.direction == "up") {
+        url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-up&id=" + controllerID + "&hash=" + date()
+    } else {
+        url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-dn&id=" + controllerID + "&hash=" + date()
+    }
+    if (logEnable) log.debug "Adjusting ${state.direction} to ${state.newposition} for ${state.difference} request to ${url}"
+    get(url,"partially open")   
+    runInMillis(state.difference.toInteger(),stopPosition)
+}
+
 def favorite() {
     url = "http://" + controllerIP + ":8838/neo/v1/transmit?command=" + blindCode + "-gp&id=" + controllerID + "&hash=" + date()
     if (logEnable) log.debug "Sending favorite GET request to ${url}"
@@ -154,22 +175,28 @@ def favorite() {
 
 def setPosition(position) { // timeToClose= closed/down, 0=open/up
     secs = timeToClose-((position/100)*timeToClose)  // get percentage based on how long it takes to open.     
-	if (secs >= timeToClose) {
+    if (logDebug) log.debug "Setting Position for ${blindCode} to ${position} (maps to travel time from open of ${secs} secs)"
+    if (secs >= timeToClose) {
 		secs = timeToClose
 	}
-    if (position != state.level) {
-            if (position > state.level) { // requested location is more closed than current. 
+    if (position != state.level)  {
+        if (logDebug) log.debug "Position: ${position}  StateLevel: ${state.level}  StateSecs: ${state.secs} Secs: ${secs}"
+            if ((position > state.level) || (state.secs > secs)) { // requested location is more closed than current. 
                 if (position == 100) {
                     open()
                     state.level=100
                     state.secs=0
                 } else {
-                    pos = state.secs - secs
-                    open()
-                    runIn(pos.toInteger(),stop)
-                    sendEvent(name: "level", value: "${position}", isStateChange: true)
-                    state.level=position
-                    state.secs=secs
+                    pos = ((state.secs - secs) * 1000) //-2000
+                    if (pos < 1000) {
+                         pos = 1000
+                    }
+                    state.direction = "up"
+                    state.difference = pos
+                    state.newposition = position
+                    state.secs = secs
+                    if (logDebug) log.debug "Opening... Stopping at ${pos} secs"
+                    runInMillis(10,runAndStop)
                 }
             } else {  // location is less closed than current
                 if (position == 0) {
@@ -177,12 +204,17 @@ def setPosition(position) { // timeToClose= closed/down, 0=open/up
                     state.level=0
                     state.secs=timeToClose
                 } else {
-                    def pos =  secs - state.secs
-                    close()
-                    runIn(pos.toInteger(),stop)
-                    sendEvent(name: "level", value: "${position}", isStateChange: true)
-                    state.level=position
-                    state.secs=secs
+                    def pos = ((secs - state.secs)*1000) //-2000
+                    if (pos < 1000) {
+                         pos = 1000
+                    }
+                    state.direction = "down"
+                    state.difference = pos
+                    state.newposition = position
+                    state.secs = secs
+                    if (logDebug) log.debug "Closing... Stopping at ${pos} secs"
+                    runInMillis(10,runAndStop)
+      
                 }
             }
       }
