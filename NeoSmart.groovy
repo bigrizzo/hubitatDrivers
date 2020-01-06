@@ -24,7 +24,7 @@
  * Based on the Hubitat community driver httpGetSwitch
  */
 metadata {
-    definition(name: "Neo Smart Controller-beta", namespace: "bigrizzo", author: "bigrizz", importUrl: "https://raw.githubusercontent.com/bdwilson/hubitatDrivers/master/NeoSmart.groovy") {
+    definition(name: "Neo Smart Controller", namespace: "bigrizzo", author: "bigrizz", importUrl: "https://raw.githubusercontent.com/bdwilson/hubitatDrivers/master/NeoSmart.groovy") {
         capability "WindowShade"
 		capability "Switch"
 		capability "Actuator"
